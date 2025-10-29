@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Boardroom</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        nav {
+            background: #f8f9fa;
+            padding: 15px 30px;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        nav button {
+            background: white;
+            border: 2px solid #667eea;
+            color: #667eea;
+            padding: 10px 20px;
+            margin-right: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        nav button:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        nav button.active {
+            background: #667eea;
+            color: white;
+        }
+
+        main {
+            padding: 30px;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .card h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .card p {
+            color: #6c757d;
+            line-height: 1.6;
+        }
+
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background: #5568d3;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #495057;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+        }
+
+        .empty-state svg {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+
+        .badge-scheduled {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .badge-completed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-cancelled {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            color: #667eea;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            cursor: pointer;
+            color: #6c757d;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .feature-card h3 {
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        .feature-card p {
+            color: rgba(255, 255, 255, 0.9);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎯 AI Boardroom</h1>
+            <p>Intelligent Board Management System</p>
+        </header>
+
+        <nav>
+            <button onclick="showSection('dashboard')" class="active" id="nav-dashboard">Dashboard</button>
+            <button onclick="showSection('meetings')" id="nav-meetings">Meetings</button>
+            <button onclick="showSection('documents')" id="nav-documents">Documents</button>
+            <button onclick="showSection('about')" id="nav-about">About</button>
+        </nav>
+
+        <main>
+            <!-- Dashboard Section -->
+            <div id="dashboard" class="section active">
+                <h2>Welcome to AI Boardroom</h2>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h3>📅 Meeting Management</h3>
+                        <p>Schedule, organize, and track board meetings with AI-powered assistance</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>📄 Document Hub</h3>
+                        <p>Centralized document repository with intelligent search and summarization</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>🤖 AI Summarization</h3>
+                        <p>Automatically generate meeting summaries and extract action items</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>✅ Action Tracking</h3>
+                        <p>Track decisions, action items, and follow-ups from board meetings</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Meetings Section -->
+            <div id="meetings" class="section">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2>Board Meetings</h2>
+                    <button class="btn" onclick="showModal('createMeeting')">➕ New Meeting</button>
+                </div>
+                <div id="meetings-list" class="grid">
+                    <div class="empty-state">
+                        <p>No meetings scheduled yet. Create your first meeting!</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Documents Section -->
+            <div id="documents" class="section">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2>Documents</h2>
+                    <button class="btn" onclick="showModal('createDocument')">➕ New Document</button>
+                </div>
+                <div id="documents-list" class="grid">
+                    <div class="empty-state">
+                        <p>No documents uploaded yet. Add your first document!</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- About Section -->
+            <div id="about" class="section">
+                <h2>About AI Boardroom</h2>
+                <div class="card">
+                    <h3>What is AI Boardroom?</h3>
+                    <p>AI Boardroom is an intelligent board management system designed to enhance governance, streamline meetings, and improve decision-making processes for boards of directors.</p>
+                </div>
+                <div class="card">
+                    <h3>Key Features</h3>
+                    <ul style="padding-left: 20px; color: #6c757d; line-height: 2;">
+                        <li><strong>Meeting Management:</strong> Schedule and organize board meetings efficiently</li>
+                        <li><strong>Agenda Planning:</strong> Create and manage detailed meeting agendas</li>
+                        <li><strong>Document Repository:</strong> Store and manage all board documents in one place</li>
+                        <li><strong>AI-Powered Summarization:</strong> Automatically generate meeting summaries and extract action items</li>
+                        <li><strong>Minutes Tracking:</strong> Record and maintain comprehensive meeting minutes</li>
+                        <li><strong>Action Items:</strong> Track decisions and follow-ups from meetings</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>Technology Stack</h3>
+                    <p>Built with Flask (Python), SQLAlchemy, and modern web technologies for a robust and scalable solution.</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Create Meeting Modal -->
+    <div id="createMeeting" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Create New Meeting</h2>
+                <button class="close-btn" onclick="closeModal('createMeeting')">&times;</button>
+            </div>
+            <form onsubmit="createMeeting(event)">
+                <div class="form-group">
+                    <label>Title *</label>
+                    <input type="text" id="meeting-title" required>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="meeting-description"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Date and Time *</label>
+                    <input type="datetime-local" id="meeting-date" required>
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select id="meeting-status">
+                        <option value="scheduled">Scheduled</option>
+                        <option value="in-progress">In Progress</option>
+                        <option value="completed">Completed</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn">Create Meeting</button>
+                <button type="button" class="btn btn-secondary" onclick="closeModal('createMeeting')" style="margin-left: 10px;">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Create Document Modal -->
+    <div id="createDocument" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add New Document</h2>
+                <button class="close-btn" onclick="closeModal('createDocument')">&times;</button>
+            </div>
+            <form onsubmit="createDocument(event)">
+                <div class="form-group">
+                    <label>Title *</label>
+                    <input type="text" id="document-title" required>
+                </div>
+                <div class="form-group">
+                    <label>Type</label>
+                    <select id="document-type">
+                        <option value="general">General</option>
+                        <option value="financial">Financial Report</option>
+                        <option value="strategic">Strategic Plan</option>
+                        <option value="legal">Legal Document</option>
+                        <option value="policy">Policy</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Content</label>
+                    <textarea id="document-content"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Summary</label>
+                    <textarea id="document-summary"></textarea>
+                </div>
+                <button type="submit" class="btn">Add Document</button>
+                <button type="button" class="btn btn-secondary" onclick="closeModal('createDocument')" style="margin-left: 10px;">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5000/api';
+
+        // Navigation
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            document.getElementById('nav-' + sectionId).classList.add('active');
+
+            if (sectionId === 'meetings') loadMeetings();
+            if (sectionId === 'documents') loadDocuments();
+        }
+
+        // Modal management
+        function showModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        // Load meetings
+        async function loadMeetings() {
+            try {
+                const response = await fetch(`${API_BASE}/meetings`);
+                const meetings = await response.json();
+                const container = document.getElementById('meetings-list');
+                
+                if (meetings.length === 0) {
+                    container.innerHTML = '<div class="empty-state"><p>No meetings scheduled yet. Create your first meeting!</p></div>';
+                    return;
+                }
+
+                container.innerHTML = meetings.map(meeting => `
+                    <div class="card">
+                        <h3>${meeting.title}</h3>
+                        <p>${meeting.description || 'No description'}</p>
+                        <p style="margin-top: 10px;"><strong>Date:</strong> ${new Date(meeting.date).toLocaleString()}</p>
+                        <p><span class="badge badge-${meeting.status}">${meeting.status}</span></p>
+                        <button class="btn" onclick="viewMeeting(${meeting.id})" style="margin-top: 10px;">View Details</button>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading meetings:', error);
+            }
+        }
+
+        // Create meeting
+        async function createMeeting(event) {
+            event.preventDefault();
+            const meeting = {
+                title: document.getElementById('meeting-title').value,
+                description: document.getElementById('meeting-description').value,
+                date: document.getElementById('meeting-date').value,
+                status: document.getElementById('meeting-status').value
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/meetings`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(meeting)
+                });
+
+                if (response.ok) {
+                    closeModal('createMeeting');
+                    event.target.reset();
+                    loadMeetings();
+                }
+            } catch (error) {
+                console.error('Error creating meeting:', error);
+            }
+        }
+
+        // Load documents
+        async function loadDocuments() {
+            try {
+                const response = await fetch(`${API_BASE}/documents`);
+                const documents = await response.json();
+                const container = document.getElementById('documents-list');
+                
+                if (documents.length === 0) {
+                    container.innerHTML = '<div class="empty-state"><p>No documents uploaded yet. Add your first document!</p></div>';
+                    return;
+                }
+
+                container.innerHTML = documents.map(doc => `
+                    <div class="card">
+                        <h3>${doc.title}</h3>
+                        <p><strong>Type:</strong> ${doc.document_type}</p>
+                        <p>${doc.summary || 'No summary available'}</p>
+                        <p style="margin-top: 10px;"><small>Uploaded: ${new Date(doc.uploaded_at).toLocaleDateString()}</small></p>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading documents:', error);
+            }
+        }
+
+        // Create document
+        async function createDocument(event) {
+            event.preventDefault();
+            const document = {
+                title: document.getElementById('document-title').value,
+                document_type: document.getElementById('document-type').value,
+                content: document.getElementById('document-content').value,
+                summary: document.getElementById('document-summary').value
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/documents`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(document)
+                });
+
+                if (response.ok) {
+                    closeModal('createDocument');
+                    event.target.reset();
+                    loadDocuments();
+                }
+            } catch (error) {
+                console.error('Error creating document:', error);
+            }
+        }
+
+        function viewMeeting(id) {
+            alert('Meeting details view would open here. Full implementation coming soon!');
+        }
+
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.classList.remove('active');
+            }
+        }
+    </script>
+</body>
+</html>
