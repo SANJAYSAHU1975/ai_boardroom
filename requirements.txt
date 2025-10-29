@@ -1,0 +1,2 @@
+# Core dependencies for AI Boardroom
+# No external dependencies required for basic functionality
