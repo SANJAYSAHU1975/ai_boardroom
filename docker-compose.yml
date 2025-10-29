@@ -11,6 +11,6 @@ services:
       - FLASK_APP=app.py
       - FLASK_ENV=production
       - DATABASE_URL=sqlite:////app/data/boardroom.db
-      - SECRET_KEY=${SECRET_KEY:-your-secret-key-here}
+      - SECRET_KEY=${SECRET_KEY}
       - OPENAI_API_KEY=${OPENAI_API_KEY:-}
     restart: unless-stopped

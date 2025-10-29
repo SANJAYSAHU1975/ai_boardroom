@@ -28,9 +28,11 @@ fi
 echo "Initializing database..."
 python -c "from app import app, db; app.app_context().push(); db.create_all(); print('Database initialized!')"
 
-# Run tests
-echo "Running tests..."
-python -m unittest test_app.py
+# Run tests only if TEST_ON_STARTUP is set
+if [ "$TEST_ON_STARTUP" = "true" ]; then
+    echo "Running tests..."
+    python -m unittest test_app.py
+fi
 
 # Start the application
 echo "🚀 Starting Flask application..."

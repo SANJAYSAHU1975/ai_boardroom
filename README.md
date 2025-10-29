@@ -88,9 +88,15 @@ The application can be configured using environment variables in the `.env` file
 
 - `FLASK_APP`: Application entry point (default: app.py)
 - `FLASK_ENV`: Development or production mode
-- `SECRET_KEY`: Secret key for session management
+- `SECRET_KEY`: Secret key for session management (⚠️ **REQUIRED** - must be set to a strong random value)
 - `DATABASE_URL`: Database connection string (default: sqlite:///boardroom.db)
 - `OPENAI_API_KEY`: OpenAI API key for AI features (optional)
+
+### Security Note
+⚠️ **Important**: Always set a strong, random `SECRET_KEY` in production. Never use the default values from `.env.example`. You can generate a secure key using:
+```bash
+python -c "import secrets; print(secrets.token_hex(32))"
+```
 
 ## 📡 API Endpoints
 
